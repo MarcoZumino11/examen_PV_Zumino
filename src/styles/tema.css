@@ -28,7 +28,13 @@ h2, h4 {
   padding: 10px 30px;
   font-family: 'Segoe UI', sans-serif;
 }
-
+.navbar-title {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #00bfff !important;
+  margin-left: 10px;
+  text-decoration: none;
+}
 .navbar-content {
   display: flex;
   justify-content: space-between;
