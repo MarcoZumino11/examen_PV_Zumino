@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Form, Button, Card } from 'react-bootstrap';
+import { Container, Form, Button } from 'react-bootstrap';
 import { calcularCosto } from '../services/costos';
 import { vehiculos } from '../data/vehiculos';
 
@@ -11,10 +11,14 @@ function ClientePanel() {
   const costo = calcularCosto(tipoVehiculo, tipoViaje);
   const conductor = vehiculos.find(v => v.tipo === tipoVehiculo)?.conductor;
 
+  function formatearCosto(valor) {
+    return Math.round(valor).toLocaleString('es-AR');
+  }
+
   return (
-    <Container>
+    <Container className="cliente-panel">
       <h2>Reserva de Viaje</h2>
-      <Form>
+      <Form className="formulario-viaje">
         <Form.Group>
           <Form.Label>Tipo de Vehículo</Form.Label>
           <Form.Select onChange={(e) => setTipoVehiculo(e.target.value)}>
@@ -34,17 +38,18 @@ function ClientePanel() {
         <Button className="mt-3" onClick={() => setMostrar(true)}>Calcular</Button>
       </Form>
 
-      {mostrar && (
-        <Card className="mt-4">
-          <Card.Body>
-            <Card.Title>Resumen del Viaje</Card.Title>
-            <Card.Text>Conductor: {conductor.nombre} ({conductor.experiencia})</Card.Text>
-            <Card.Text>Costo: ${costo}</Card.Text>
-          </Card.Body>
-        </Card>
-      )}
+      {mostrar && conductor && (
+  <div className="resumen-viaje mt-4">
+    <h4 className="resumen-titulo">🧾 Resumen del Viaje</h4>
+    <hr />
+    <p><strong>Conductor:</strong> {conductor.nombre} <span className="experiencia">– Experiencia: {conductor.experiencia} años</span></p>
+    <p><strong>Costo:</strong> <span className="costo">${formatearCosto(costo)}</span></p>
+  </div>
+)}
+
     </Container>
   );
 }
 
 export default ClientePanel;
+
