@@ -11,6 +11,9 @@ function ClientePanel() {
   const costo = calcularCosto(tipoVehiculo, tipoViaje);
   const conductor = vehiculos.find(v => v.tipo === tipoVehiculo)?.conductor;
 
+  // 🔐 Verificación de sesión
+  const isLoggedIn = localStorage.getItem("usuarioLogueado") === "true";
+
   function formatearCosto(valor) {
     return Math.round(valor).toLocaleString('es-AR');
   }
@@ -35,21 +38,33 @@ function ClientePanel() {
             <option value="larga">Larga</option>
           </Form.Select>
         </Form.Group>
-        <Button className="mt-3" onClick={() => setMostrar(true)}>Calcular</Button>
+
+        <Button
+          className="mt-3"
+          onClick={() => setMostrar(true)}
+          disabled={!isLoggedIn}
+          variant={isLoggedIn ? "primary" : "secondary"}
+        >
+          Calcular
+        </Button>
+
+        {!isLoggedIn && (
+          <p className="text-warning mt-2">
+            Debes iniciar sesión para calcular el costo del viaje.
+          </p>
+        )}
       </Form>
 
       {mostrar && conductor && (
-  <div className="resumen-viaje mt-4">
-    <h4 className="resumen-titulo">🧾 Resumen del Viaje</h4>
-    <hr />
-    <p><strong>Conductor:</strong> {conductor.nombre} <span className="experiencia">– Experiencia: {conductor.experiencia} años</span></p>
-    <p><strong>Costo:</strong> <span className="costo">${formatearCosto(costo)}</span></p>
-  </div>
-)}
-
+        <div className="resumen-viaje mt-4">
+          <h4 className="resumen-titulo">🧾 Resumen del Viaje</h4>
+          <hr />
+          <p><strong>Conductor:</strong> {conductor.nombre} <span className="experiencia">– Experiencia: {conductor.experiencia} años</span></p>
+          <p><strong>Costo:</strong> <span className="costo">${formatearCosto(costo)}</span></p>
+        </div>
+      )}
     </Container>
   );
 }
 
 export default ClientePanel;
-
