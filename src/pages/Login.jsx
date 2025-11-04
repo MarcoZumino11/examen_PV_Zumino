@@ -9,14 +9,19 @@ function Login() {
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
-    e.preventDefault();
-    const user = JSON.parse(localStorage.getItem(email));
-    if (user && user.password === password && user.activo) {
-      user.rol === 'admin' ? navigate('/admin') : navigate('/cliente');
-    } else {
-      alert('Credenciales inválidas o usuario inactivo');
-    }
-  };
+  e.preventDefault();
+  const user = JSON.parse(localStorage.getItem(email));
+  if (user && user.password === password && user.activo) {
+    // Guardar sesión
+    localStorage.setItem("usuarioLogueado", "true");
+
+    // Redirigir según rol
+    user.rol === 'admin' ? navigate('/admin') : navigate('/cliente');
+  } else {
+    alert('Credenciales inválidas o usuario inactivo');
+  }
+};
+
 
   return (
     <Container>

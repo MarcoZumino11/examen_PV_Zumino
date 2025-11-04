@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import { calcularCosto } from '../services/costos';
-import { vehiculos } from '../data/vehiculos';
 
 function ClientePanel() {
   const [tipoVehiculo, setTipoVehiculo] = useState('X');
   const [tipoViaje, setTipoViaje] = useState('corta');
   const [mostrar, setMostrar] = useState(false);
 
-  const costo = calcularCosto(tipoVehiculo, tipoViaje);
-  const conductor = vehiculos.find(v => v.tipo === tipoVehiculo)?.conductor;
+  // Leer vehículos desde localStorage
+  const vehiculos = JSON.parse(localStorage.getItem('vehiculos')) || [];
 
-  // 🔐 Verificación de sesión
+  const costo = calcularCosto(tipoVehiculo, tipoViaje);
+  const conductoresDisponibles = vehiculos.filter(v => v.tipo === tipoVehiculo && v.activo);
+  const conductor = conductoresDisponibles.length > 0
+    ? conductoresDisponibles[Math.floor(Math.random() * conductoresDisponibles.length)]
+    : null;
+
   const isLoggedIn = localStorage.getItem("usuarioLogueado") === "true";
 
   function formatearCosto(valor) {
@@ -55,11 +59,19 @@ function ClientePanel() {
         )}
       </Form>
 
+      {/* 🔔 Alerta si no hay conductores disponibles */}
+      {mostrar && conductoresDisponibles.length === 0 && (
+        <p className="text-danger mt-4">
+          No hay vehículos disponibles para el tipo seleccionado. Por favor, intenta con otro tipo.
+        </p>
+      )}
+
+      {/* 🧾 Resumen del viaje */}
       {mostrar && conductor && (
         <div className="resumen-viaje mt-4">
           <h4 className="resumen-titulo">🧾 Resumen del Viaje</h4>
           <hr />
-          <p><strong>Conductor:</strong> {conductor.nombre} <span className="experiencia">– Experiencia: {conductor.experiencia} años</span></p>
+          <p><strong>Conductor:</strong> {conductor.conductor || conductor.nombre} <span className="experiencia">– Experiencia: {conductor.experiencia} años</span></p>
           <p><strong>Costo:</strong> <span className="costo">${formatearCosto(costo)}</span></p>
         </div>
       )}
