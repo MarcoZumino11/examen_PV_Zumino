@@ -2,26 +2,22 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 
-
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
-  e.preventDefault();
-  const user = JSON.parse(localStorage.getItem(email));
-  if (user && user.password === password && user.activo) {
-    // Guardar sesión
-    localStorage.setItem("usuarioLogueado", "true");
-
-    // Redirigir según rol
-    user.rol === 'admin' ? navigate('/admin') : navigate('/cliente');
-  } else {
-    alert('Credenciales inválidas o usuario inactivo');
-  }
-};
-
+    e.preventDefault();
+    const user = JSON.parse(localStorage.getItem(email));
+    if (user && user.password === password && user.activo) {
+      localStorage.setItem("usuarioLogueado", "true");
+      localStorage.setItem("usuarioActivo", JSON.stringify(user));
+      user.rol === 'admin' ? navigate('/admin') : navigate('/cliente');
+    } else {
+      alert('Credenciales inválidas o usuario inactivo');
+    }
+  };
 
   return (
     <Container>

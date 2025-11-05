@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Container, Table, Button, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 function AdminPanel() {
+  const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [nuevoUsuario, setNuevoUsuario] = useState({ nombre: '', email: '', password: '', rol: 'cliente' });
@@ -9,18 +11,33 @@ function AdminPanel() {
   const [experiencia, setExperiencia] = useState('');
 
   useEffect(() => {
-    const keys = Object.keys(localStorage);
-    const listaUsuarios = keys.map(k => JSON.parse(localStorage.getItem(k))).filter(u => u?.rol);
-    setUsuarios(listaUsuarios);
+  const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+  if (!usuario || usuario.rol !== "admin" || !usuario.activo) {
+    alert("Acceso denegado. Solo administradores.");
+    navigate("/");
+    return;
+  }
+  cargarDatos();
+}, []);
 
-    const listaVehiculos = JSON.parse(localStorage.getItem('vehiculos')) || [];
-    setVehiculos(listaVehiculos);
-  }, []);
+const cargarDatos = () => {
+  const listaUsuarios = [];
+  for (let key in localStorage) {
+    if (key.includes("@")) {
+      const user = JSON.parse(localStorage.getItem(key));
+      if (user?.rol) listaUsuarios.push(user);
+    }
+  }
+  setUsuarios(listaUsuarios);
 
+  const listaVehiculos = JSON.parse(localStorage.getItem('vehiculos')) || [];
+  setVehiculos(listaVehiculos);
+  
+};
   const agregarUsuario = () => {
     localStorage.setItem(nuevoUsuario.email, JSON.stringify({ ...nuevoUsuario, activo: true }));
     alert('Usuario agregado');
-    window.location.reload();
+    cargarDatos();
   };
 
   const agregarVehiculo = () => {
@@ -28,14 +45,14 @@ function AdminPanel() {
     const actualizados = [...vehiculos, vehiculoConExperiencia];
     localStorage.setItem('vehiculos', JSON.stringify(actualizados));
     alert('Vehículo agregado');
-    window.location.reload();
+    cargarDatos();
   };
 
   const eliminarUsuario = (email) => {
     const user = JSON.parse(localStorage.getItem(email));
     localStorage.setItem(email, JSON.stringify({ ...user, activo: false }));
     alert('Usuario desactivado');
-    window.location.reload();
+    cargarDatos();
   };
 
   const activarUsuario = (email) => {
@@ -43,7 +60,7 @@ function AdminPanel() {
     if (user) {
       localStorage.setItem(email, JSON.stringify({ ...user, activo: true }));
       alert('Usuario reactivado');
-      window.location.reload();
+      cargarDatos();
     }
   };
 
@@ -52,17 +69,16 @@ function AdminPanel() {
     actualizados[index].activo = false;
     localStorage.setItem('vehiculos', JSON.stringify(actualizados));
     alert('Vehículo desactivado');
-    window.location.reload();
+    cargarDatos();
   };
 
   const activarVehiculo = (index) => {
-  const actualizados = [...vehiculos];
-  actualizados[index].activo = true;
-  localStorage.setItem('vehiculos', JSON.stringify(actualizados));
-  alert('Vehículo reactivado');
-  window.location.reload();
-};
-
+    const actualizados = [...vehiculos];
+    actualizados[index].activo = true;
+    localStorage.setItem('vehiculos', JSON.stringify(actualizados));
+    alert('Vehículo reactivado');
+    cargarDatos();
+  };
 
   return (
     <div className="admin-container">
@@ -122,31 +138,31 @@ function AdminPanel() {
         </tbody>
       </Table>
 
-     <h4 className="mt-4">Vehículos</h4>
-<Table striped bordered className="table">
-  <thead>
-    <tr><th>Tipo</th><th>Conductor</th><th>Experiencia</th><th>Activo</th><th>Acción</th></tr>
-  </thead>
-  <tbody>
-    {vehiculos.map((v, i) => (
-      <tr key={i}>
-        <td>{v.tipo}</td>
-        <td>{v.conductor}</td>
-        <td>{v.experiencia || '—'}</td>
-        <td>{v.activo ? 'Sí' : 'No'}</td>
-        <td>
-          {v.activo ? (
-            <Button variant="danger" onClick={() => eliminarVehiculo(i)}>Eliminar</Button>
-          ) : (
-            <Button variant="success" onClick={() => activarVehiculo(i)}>Activar</Button>
-          )}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</Table>
+      <h4 className="mt-4">Vehículos</h4>
+      <Table striped bordered className="table">
+        <thead>
+          <tr><th>Tipo</th><th>Conductor</th><th>Experiencia</th><th>Activo</th><th>Acción</th></tr>
+        </thead>
+        <tbody>
+          {vehiculos.map((v, i) => (
+            <tr key={i}>
+              <td>{v.tipo}</td>
+              <td>{v.conductor}</td>
+              <td>{v.experiencia || '—'}</td>
+              <td>{v.activo ? 'Sí' : 'No'}</td>
+              <td>
+                {v.activo ? (
+                  <Button variant="danger" onClick={() => eliminarVehiculo(i)}>Eliminar</Button>
+                ) : (
+                  <Button variant="success" onClick={() => activarVehiculo(i)}>Activar</Button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
-} 
+}
 
 export default AdminPanel;

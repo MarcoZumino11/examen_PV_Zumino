@@ -1,15 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { calcularCosto } from '../services/costos';
 
 function ClientePanel() {
+  const navigate = useNavigate();
   const [tipoVehiculo, setTipoVehiculo] = useState('X');
   const [tipoViaje, setTipoViaje] = useState('corta');
   const [mostrar, setMostrar] = useState(false);
 
-  // Leer vehículos desde localStorage
-  const vehiculos = JSON.parse(localStorage.getItem('vehiculos')) || [];
+  useEffect(() => {
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (!usuario || usuario.rol !== "cliente" || !usuario.activo) {
+      alert("Acceso denegado. Solo clientes.");
+      navigate("/");
+    }
+  }, []);
 
+  const vehiculos = JSON.parse(localStorage.getItem('vehiculos')) || [];
   const costo = calcularCosto(tipoVehiculo, tipoViaje);
   const conductoresDisponibles = vehiculos.filter(v => v.tipo === tipoVehiculo && v.activo);
   const conductor = conductoresDisponibles.length > 0
@@ -71,8 +79,13 @@ function ClientePanel() {
         <div className="resumen-viaje mt-4">
           <h4 className="resumen-titulo">🧾 Resumen del Viaje</h4>
           <hr />
-          <p><strong>Conductor:</strong> {conductor.conductor || conductor.nombre} <span className="experiencia">– Experiencia: {conductor.experiencia} años</span></p>
-          <p><strong>Costo:</strong> <span className="costo">${formatearCosto(costo)}</span></p>
+          <p>
+            <strong>Conductor:</strong> {conductor.conductor || conductor.nombre}
+            <span className="experiencia"> – Experiencia: {conductor.experiencia} años</span>
+          </p>
+          <p>
+            <strong>Costo:</strong> <span className="costo">${formatearCosto(costo)}</span>
+          </p>
         </div>
       )}
     </Container>

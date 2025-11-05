@@ -9,8 +9,8 @@ function Home() {
         <Container className="home-content">
           <h1 className="home-title">Uber Viajes</h1>
           <p className="home-subtitle">Tu viaje comienza aquí</p>
-          <Link to="/cliente">
-            <Button variant="light" className="home-btn">Reservar ahora</Button>
+          <Link to="/registro">
+            <Button variant="light" className="home-btn">Registrarse</Button>
           </Link>
         </Container>
       </div>

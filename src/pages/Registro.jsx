@@ -2,17 +2,18 @@ import { useState } from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
 
 function Registro() {
-  const [usuario, setUsuario] = useState({
-    nombre: '',
+  const [usuario, setUsuario] = useState({ 
+    nombre: '', 
     email: '',
     password: '',
     rol: 'cliente'
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    localStorage.setItem(usuario.email, JSON.stringify({ ...usuario, activo: true }));
-    alert('Usuario registrado correctamente');
+  const handleSubmit = (e) => { 
+    e.preventDefault(); 
+    localStorage.setItem(usuario.email, JSON.stringify({ ...usuario, activo: true })); 
+    alert('Usuario registrado correctamente'); 
+    navigate("/login");
 
     //Restablecer el formulario
     setUsuario({
@@ -30,10 +31,10 @@ function Registro() {
         <Form.Group>
           <Form.Label>Nombre</Form.Label>
           <Form.Control
-            type="text"
+            type="text" 
             required
             value={usuario.nombre}
-            onChange={(e) => setUsuario({ ...usuario, nombre: e.target.value })}
+            onChange={(e) => setUsuario({ ...usuario, nombre: e.target.value })}  
           />
         </Form.Group>
         <Form.Group>
